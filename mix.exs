@@ -3,7 +3,7 @@ defmodule Snap.MixProject do
 
   @original_github_url "https://github.com/breakroom/snap"
   @github_url "https://github.com/surgeventures/snap"
-  @version "0.10.3"
+  @version "0.10.4"
 
   def project do
     [
