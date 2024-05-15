@@ -86,7 +86,7 @@ defmodule Snap.SearchResponseTest do
   end
 
   test "new/1 with sorted" do
-    json = fixture_json("search_response_inner_hits")
+    json = fixture_json("search_response_sorted")
 
     response = SearchResponse.new(json)
     first_hit = Enum.at(response.hits, 0)
