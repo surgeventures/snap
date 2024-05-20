@@ -1,11 +1,9 @@
-name: Build & Test
+name: Build & Publish
 
 on:
   pull_request:
   push:
     branches:
-      - "*"
-    branches-ignore:
       - "main"
 
 # by default, permissions are read-only, read + write is required for git pushes
@@ -35,18 +33,6 @@ jobs:
         with:
           submodules: true
 
-      - name: Configure sysctl limits
-        run: |
-          sudo swapoff -a
-          sudo sysctl -w vm.swappiness=1
-          sudo sysctl -w fs.file-max=262144
-          sudo sysctl -w vm.max_map_count=262144
-
-      - name: Runs Elasticsearch
-        uses: elastic/elastic-github-actions/elasticsearch@master
-        with:
-          stack-version: 7.6.0
-
       - uses: erlef/setup-beam@v1
         id: setup-elixir
         with:
@@ -74,11 +60,11 @@ jobs:
       - run: mix deps.compile --warnings-as-errors
         if: steps.cache-deps.outputs.cache-hit != 'true'
 
-      - name: Check for unused deps
-        run: mix deps.unlock --check-unused
+      - name: Build & Publish
+        run: |
+          mix hex.build
+          mix hex.publish --yes
         if: matrix.check_formatted
-
-      - run: mix format --check-formatted
-        if: matrix.check_formatted
-
-      - run: mix test --include integration
+        env:
+          MIX_ENV: dev
+          HEX_API_KEY: ${{ secrets.HEX_ORGANIZATION_WRITE_KEY }}
